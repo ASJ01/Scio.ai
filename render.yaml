@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: social-media-post-manager
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: FLASK_SECRET_KEY
+        sync: false
+      - key: LINKEDIN_CLIENT_ID
+        sync: false
+      - key: LINKEDIN_CLIENT_SECRET
+        sync: false
+      - key: LINKEDIN_REDIRECT_URI
+        value: https://your-app-name.onrender.com/auth/linkedin/callback
+      - key: TWITTER_CLIENT_ID
+        sync: false
+      - key: TWITTER_CLIENT_SECRET
+        sync: false
+      - key: TWITTER_REDIRECT_URI
+        value: https://your-app-name.onrender.com/auth/twitter/callback 

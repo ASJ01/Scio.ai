@@ -9,18 +9,20 @@ import secrets
 import base64
 import hashlib
 from flask_session import Session
+from flask_cors import CORS
 
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "fallback_secret_key")
+CORS(app)  # Enable CORS for all routes
 
 # Configure session
-app.config['SESSION_COOKIE_SAMESITE'] = None
-app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Changed from None for better security
+app.config['SESSION_COOKIE_SECURE'] = True  # Enable secure cookies
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
 app.config['SESSION_TYPE'] = 'filesystem'
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "fallback_secret_key")
 Session(app)
 
 # LinkedIn credentials
@@ -31,7 +33,7 @@ LINKEDIN_REDIRECT_URI = os.getenv("LINKEDIN_REDIRECT_URI", "http://localhost:500
 # Twitter credentials
 TWITTER_CLIENT_ID = os.getenv("TWITTER_CLIENT_ID")
 TWITTER_CLIENT_SECRET = os.getenv("TWITTER_CLIENT_SECRET")
-TWITTER_REDIRECT_URI = os.getenv("TWITTER_REDIRECT_URI", "http://127.0.0.1:5000/auth/twitter/callback")
+TWITTER_REDIRECT_URI = os.getenv("TWITTER_REDIRECT_URI", "http://localhost:5000/auth/twitter/callback")
 
 # Store user credentials (in a real app, use a secure database)
 user_credentials = {}
@@ -280,4 +282,7 @@ def post():
                          twitter_linked='twitter' in user_credentials)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Use environment variables for production settings
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('FLASK_ENV') == 'development'
+    app.run(host='0.0.0.0', port=port, debug=debug)
